@@ -803,19 +803,40 @@ class DistilBertForTokenClassification(DistilBertPreTrainedModel):
 
         sequence_output = self.dropout(sequence_output)
         logits = self.classifier(sequence_output)
+        
+        print(f'[logits]', logits.shape)
 
         loss = None
         if labels is not None:
+            
+            print(f'[labels]', labels.shape)
             loss_fct = CrossEntropyLoss()
+           
             # Only keep active parts of the loss
             if attention_mask is not None:
+             
+                print(f'[attention_mask] BF:', attention_mask.shape)
                 active_loss = attention_mask.view(-1) == 1
+                print(f'[active_loss] AF:', active_loss.shape)
+                print('\n\n')
+                
+                print(f'[logits] BF:', logits.shape)
                 active_logits = logits.view(-1, self.num_labels)
+                print(f'[active_logits] AF:', active_logits.shape)
+                print('\n\n')
+                
                 active_labels = torch.where(
                     active_loss, labels.view(-1), torch.tensor(loss_fct.ignore_index).type_as(labels)
                 )
+                
+                print(f'[active_logits] LOSS:', active_logits.shape)
+                print(f'[active_labels] LOSS:', active_labels.shape)
+                print('\n\n')
                 loss = loss_fct(active_logits, active_labels)
             else:
+                print(f'[logits.view(-1, self.num_labels)] ELSE LOSS:', logits.view(-1, self.num_labels).shape)
+                print(f'[labels.view(-1)] ELSE LOSS:', labels.view(-1).shape)
+                print('\n\n')
                 loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
 
         if not return_dict:
