@@ -789,6 +789,9 @@ class DistilBertForTokenClassification(DistilBertPreTrainedModel):
         """
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
+        print(f'[INPUT] input_ids ', input_ids.shape)
+        print(f'[INPUT] attention_mask ', attention_mask.shape)
+        
         outputs = self.distilbert(
             input_ids,
             attention_mask=attention_mask,
